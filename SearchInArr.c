@@ -8,24 +8,12 @@
 int recurseCounter = 0;
 
 
-int consoleIndexInput ()
-{
-    printf("\nВведіть число індекс якого потрібно дізнатись: ");
-    int searchiningNumber;
-    scanf("%d", &searchiningNumber);
-
-    return searchiningNumber;
-}
-
-
 void swap(int* xp, int* yp)
 {
     int temp = *xp;
     *xp = *yp;
     *yp = temp;
 }
-
-
 void selectionSort(int arr[], int sizeArr)
 {
     int min_idx;
@@ -40,44 +28,6 @@ void selectionSort(int arr[], int sizeArr)
 
         swap(&arr[min_idx], &arr[i]);
     }
-}
-
-
-int indexOfSerchiningNumInArrRecursion(int arr[], int left, int right,int center, int searchiningNumber)
-{
-    recurseCounter++;
-    
-    center = (left + right) / 2;
-    
-    if (arr[center] > searchiningNumber)
-    {
-        right = center - 1;
-        indexOfSerchiningNumInArrRecursion(arr, left, right, center, searchiningNumber);
-        
-    }
-    else if (arr[center] < searchiningNumber)
-    {
-        left = center + 1;
-        indexOfSerchiningNumInArrRecursion(arr, left, right, center, searchiningNumber);
-    }
-    else
-    {
-         return center;
-    }
-}
-
-
-int indexOfSerchiningNumInArrCycle(int arr[], int arrSize, int serchiningNumber, int* counter)
-{
-    for (int i = 0; i < arrSize; i++)
-    {
-        if (serchiningNumber == arr[i])
-        {
-            return i;
-        }
-        *counter += 1;
-    }
-    printf("Помилка, такого числа немає в масиві\n");
 }
 
 
@@ -109,12 +59,110 @@ void randomFillingArr(int arr[], int arrSize, int spreatInRandom)
 }
 
 
+int indexOfSerchiningNumInArrBinarRecursion(int arr[], int left, int right,int center, int searchiningNumber)
+{
+    // left - початок області роботи, right - кінець області роботи
+    recurseCounter++;
+    
+    center = (left + right) / 2;
+    
+    if (arr[center] > searchiningNumber)
+    {
+        right = center - 1;
+        indexOfSerchiningNumInArrBinarRecursion(arr, left, right, center, searchiningNumber);
+        
+    }
+    else if (arr[center] < searchiningNumber)
+    {
+        left = center + 1;
+        indexOfSerchiningNumInArrBinarRecursion(arr, left, right, center, searchiningNumber);
+    }
+    else
+    {
+         return center;
+    }
+}
+int indexOfSerchiningNumInArrLinearCycle(int arr[], int arrSize, int searchiningNumber, int* counter)
+{
+    for (int i = 0; i < arrSize; i++)
+    {
+        if (searchiningNumber == arr[i])
+        {
+            return i;
+        }
+        *counter += 1;
+    }
+    printf("Помилка, такого числа немає в масиві\n");
+}
+int indexOfSerchiningNumInArrBinarCycle(int arr[], int left, int right, int center, int searchiningNumber, int *counter)
+{
+    // left - початок області роботи, right - кінець області роботи
+    while (1)
+    {
+        
+        center = (left + right) / 2;
+
+        if (arr[center] > searchiningNumber)
+        {
+            right = center - 1;
+        }
+        else if (arr[center] < searchiningNumber)
+        {
+            left = center + 1;
+        }
+        else
+        {
+            return center;
+        }
+        *counter += 1;
+    }
+}
+
+void infoOfBinarRecurtionMethod(int arr [], int sizeArr, int searchiningNumber)
+{
+    int center = 0;
+    int index = indexOfSerchiningNumInArrBinarRecursion(arr, 0, sizeArr, center, searchiningNumber);
+
+    printf("Пошук рекурсією зайняв %d операцій та видав індекс %d", recurseCounter, index);
+}
+void infoOfLinearCycleMethod(int arr[], int sizeArr, int searchiningNumber)
+{
+    int linearCycleCounter = 1;
+    int index = indexOfSerchiningNumInArrLinearCycle(arr, sizeArr, searchiningNumber, &linearCycleCounter);
+
+    printf("Пошук лінійним циклом зайняв %d операцій та видав індекс %d\n", linearCycleCounter, index);
+}
+void infoOfBinarCycleMethod(int arr[], int sizeArr, int searchiningNumber)
+{
+    int center = 0;
+    int BinarCycleCounter = 1;
+    int index = indexOfSerchiningNumInArrBinarCycle(arr, 0, sizeArr, center, searchiningNumber, &BinarCycleCounter);
+
+    printf("\nПошук бінарним циклом зайняв %d операцій та видав індекс %d", BinarCycleCounter, index);
+}
+
+
+int consoleIndexInput ()
+{
+    printf("\nВведіть число індекс якого потрібно дізнатись: ");
+    int searchiningNumber;
+    scanf("%d", &searchiningNumber);
+
+    return searchiningNumber;
+}
 void printArr(int arr[], int sizeArr)
 {
     for (int i = 0; i < sizeArr; ++i)
     {
         printf("%d  ", arr[i]);
     }
+}
+
+
+void arrayInit(int arr[], int sizeArr)
+{
+    randomFillingArr(arr, sizeArr, 100);
+    selectionSort(arr, sizeArr);
 }
 
 
@@ -128,26 +176,17 @@ int main()
 
 
     int arr[30];
-
     const int SIZE_ARRAY = sizeof(arr) / sizeof(int);
 
-    randomFillingArr(arr, SIZE_ARRAY, 100);
-    selectionSort(arr, SIZE_ARRAY);
-
+    arrayInit(arr, SIZE_ARRAY);
     printArr(arr, SIZE_ARRAY);
-
     
     int searchiningNumber = consoleIndexInput();
 
 
-    int cycleCounter = 1;
-    int indexFirst = indexOfSerchiningNumInArrCycle(arr, SIZE_ARRAY, searchiningNumber, &cycleCounter);
+    infoOfLinearCycleMethod(arr, SIZE_ARRAY, searchiningNumber);
 
-    printf("Пошук циклом зайняв %d операцій та видав індекс %d\n", cycleCounter, indexFirst);
+    infoOfBinarRecurtionMethod(arr, SIZE_ARRAY, searchiningNumber);
 
-    
-    int center = 0;
-    int indexSecond = indexOfSerchiningNumInArrRecursion(arr, 0, SIZE_ARRAY, center, searchiningNumber);
-
-    printf("Пошук рекурсією зайняв %d операцій та видав індекс %d", recurseCounter, indexSecond);
+    infoOfBinarCycleMethod(arr, SIZE_ARRAY, searchiningNumber);
 }
